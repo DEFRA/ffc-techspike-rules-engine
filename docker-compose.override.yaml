@@ -2,11 +2,11 @@
 # to provide dependencies and expose ports for local testing
 
 services:
-  ffc-template-node:
+  rules-engine-poc-jbpm:
     build:
       target: development
-    image: ffc-template-node-development
-    container_name: ffc-template-node-development
+    image: rules-engine-poc-jbpm-development
+    container_name: rules-engine-poc-jbpm-development
     ports:
       - "3000:3000"
       - "9229:9229"

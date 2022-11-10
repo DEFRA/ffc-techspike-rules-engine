@@ -1,3 +1,3 @@
 services:
-  ffc-template-node:
+  rules-engine-poc-jbpm:
     command: npm run start:debug

@@ -1,8 +1,8 @@
 {
-  "name": "ffc-template-node",
+  "name": "rules-engine-poc-jbpm",
   "version": "0.1.0",
-  "description": "description-of-project-goes-here",
-  "homepage": "https://github.com/DEFRA/ffc-template-node",
+  "description": "A proof of concept node js app that utilizes a JBPM service",
+  "homepage": "https://github.com/DEFRA/rules-engine-poc-jbpm",
   "main": "app/index.js",
   "scripts": {
     "pretest": "npm run test:lint",
@@ -18,7 +18,11 @@
   "license": "OGL-UK-3.0",
   "dependencies": {
     "@hapi/hapi": "20.2.2",
-    "applicationinsights": "2.3.5"
+    "@hapi/vision": "^7.0.0",
+    "applicationinsights": "2.3.5",
+    "govuk-frontend": "^4.3.1",
+    "joi": "^17.7.0",
+    "nunjucks": "^3.2.3"
   },
   "devDependencies": {
     "jest": "29.2.2",

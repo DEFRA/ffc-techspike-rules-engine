@@ -1,10 +1,10 @@
 services:
-  ffc-template-node:
+  rules-engine-poc-jbpm:
     build:
       context: .
       target: production
-    image: ffc-template-node
-    container_name: ffc-template-node
+    image: rules-engine-poc-jbpm
+    container_name: rules-engine-poc-jbpm
     environment:
-      APPINSIGHTS_CLOUDROLE: ffc-template-node-local
+      APPINSIGHTS_CLOUDROLE: rules-engine-poc-jbpm-local
       APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}

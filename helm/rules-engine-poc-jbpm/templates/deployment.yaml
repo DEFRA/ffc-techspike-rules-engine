@@ -1,0 +1,8 @@
+{{- include "ffc-helm-library.deployment" (list . "rules-engine-poc-jbpm.deployment") -}}
+{{- define "rules-engine-poc-jbpm.deployment" -}}
+spec:
+  template:
+    spec:
+      containers:
+      - {{ include "ffc-helm-library.container" (list . "rules-engine-poc-jbpm.container") }}
+{{- end -}}

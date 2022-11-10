@@ -1,0 +1,22 @@
+
+{# {% extends '.layout.njk' %} #}
+{% block pageTitle %}
+  {{siteTitle}}
+{% endblock %}
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-main-wrapper--auto-spacing">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-xl">Select an SBI</h1>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          <form action="POST" action="sbi">
+            <input type="hidden" name="sbiID" value="1">
+            <input type="submit" value="Pick SBI 1">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

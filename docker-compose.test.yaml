@@ -2,11 +2,11 @@
 # that test output is saved to the host
 
 services:
-  ffc-template-node:
+  rules-engine-poc-jbpm:
     build:
       target: development
-    image: ffc-template-node-development
-    container_name: ffc-template-node-test
+    image: rules-engine-poc-jbpm-development
+    container_name: rules-engine-poc-jbpm-test
     command: npm run test
     volumes:
       - ./app:/home/node/app
