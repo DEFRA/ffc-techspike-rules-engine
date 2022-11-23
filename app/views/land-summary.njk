@@ -1,0 +1,59 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% extends './layouts/layout.njk' %}
+
+{% block pageTitle %}
+  {{siteTitle}}
+{% endblock %}
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-main-wrapper--auto-spacing">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-xl">Land summary</h1>
+          <p class="govuk-body">The land summary shows what is currently registered against your SBI</p>
+          <p class="govuk-body">You have {{ totalLand }} hectares across {{ totalParcels }} parcels</p>
+          {% for landType, total in totals %}
+            <p class="govuk-body">You have {{ total.hectares }} {{ landType}} of land across {{ total.parcels }} parcels</p>
+          {% endfor %}
+          <h2 class="govuk-heading-xl">Check your land details before selecting your stadard(s)</h2>
+          <p class="govuk-body">Before you select your standard(s), use the <a href=''>Land Viewer</a> to check the land parcels you&apos;ll be selecting are linked to your SBI and have correctly registered:</p>
+          <p class="govuk-body">
+            <ul class="govuk-list govuk-list--bullet">
+              <li>land covers</li>
+              <li>permanent boundaries</li>
+            </ul>
+          </p>
+          <p class="govuk-body">Read <a href=''>Check your land details before you apply for an SFI standards agreement</a> on GOV.UK for more information.</p>
+          
+              {{ govukRadios({
+                name: "landDetailsUpToDate",
+                fieldset: {
+                  legend: {
+                    text: "Are your land details up to date?",
+                    isPageHeading: true,
+                    classes: "govuk-fieldset__legend--l"
+                  }
+                },
+                items: [
+                  {
+                    value: "yes",
+                    text: "Yes, my land details are up to date"
+                  },
+                  {
+                    value: "no",
+                    text: "No, I need to update my land details"
+                  }
+                ]
+              }) }}
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          <form method="post" action="jbpm-communicator">
+            {{ govukButton({
+              text: "Save and continue"
+            }) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

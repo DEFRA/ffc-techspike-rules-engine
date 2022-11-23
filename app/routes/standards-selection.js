@@ -1,11 +1,9 @@
-const viewTemplate = "home";
+const viewTemplate = "standards-selection";
 
 module.exports = {
   method: "GET",
-  path: "/",
+  path: "/standards-selection",
   handler: (request, h) => {
-    //send BMI to jbpm endpoint and get list of land parcels
-
     return h.view(viewTemplate);
   },
 };

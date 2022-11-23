@@ -1,4 +1,4 @@
-const Joi = require("joi");
+// const Joi = require("joi");
 const { setYarValue, getYarValue } = require("../helpers/session");
 
 const viewTemplate = "sbi";
@@ -28,7 +28,7 @@ const sbiData = {
 module.exports = [
   {
     method: "GET",
-    path: "/sbi/",
+    path: "/sbi",
     handler: (request, h) => {
       const sbiID = getYarValue(request, "sbiID");
       const properties = sbiData[sbiID].properties;
@@ -42,11 +42,11 @@ module.exports = [
     options: {
       validate: {
         options: { abortEarly: false },
-        payload: Joi.object({
-          sbiID: Joi.string().required(),
-        }),
+        // payload: Joi.object({
+        //   sbiID: Joi.string().required(),
+        // }),
         failAction: (request, h, err) => {
-          return "oh dear";
+          return "sbiID not supplied";
         },
       },
       handler: async (request, h) => {
@@ -54,7 +54,7 @@ module.exports = [
 
         setYarValue(request, "sbiID", sbiID);
 
-        return h.view(viewTemplate, { sbiID });
+        return h.redirect("/sbi");
       },
     },
   },

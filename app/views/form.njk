@@ -1,0 +1,28 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from './components/renderFields.njk' import renderFields %}
+
+{% extends './layouts/layout.njk' %}
+
+{% block pageTitle %}
+  {{siteTitle}}
+{% endblock %}
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-main-wrapper--auto-spacing">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-xl">Dynamic form [{{ formId }}] (ariable form etc)</h1>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+
+          <form method="POST" action="/jbpm-communicator" autocomplete="off" novalidate>
+            {{ renderFields(fields) }}
+            {{ govukButton({
+              text: "Save and continue"
+            }) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

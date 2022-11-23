@@ -1,0 +1,160 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+
+{% macro renderFields(fields) %}
+  {% for field in fields %}
+    {% if field.code == 'HTML' %}
+      //just render the html
+    {% endif %}
+
+    {% if field.code == 'TextBox' %}
+      {{
+        govukInput({
+          id: field.id,
+          name: field.name,
+          label: {
+            text: field.label
+          }
+        })
+      }}
+    {% endif %}
+
+    {% if field.code == 'TextArea' %}
+      {{
+        govukTextarea({
+          name: field.name,
+          id: field.id,
+          label: {
+            text: field.label
+          },
+          hint: {
+            text: field.hint
+          }
+        }) 
+      }}
+    {% endif %}
+    
+    {% if field.code == 'IntegerBox' %}
+    {{ govukInput({
+        label: {
+          text: field.name,
+          isPageHeading: true
+        },
+        id: field.id,
+        name: field.name,
+        inputmode: "numeric",
+        spellcheck: false
+      }) }}
+    {% endif %}
+
+    {% if field.code == 'DecimalBox' %}
+    number input with floats
+    {% endif %}
+
+    {% if field.code == 'CheckBox' %}
+    {{ govukCheckboxes({
+        name: field.name,
+        fieldset: {
+          legend: {
+            text: field.label,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        hint: {
+          text: "Select all that apply."
+        },
+        items: [
+          {
+            value: "carcasses",
+            text: "Waste from animal carcasses"
+          },
+          {
+            value: "mines",
+            text: "Waste from mines or quarries"
+          },
+          {
+            value: "farm",
+            text: "Farm or agricultural waste"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    {% if field.code == 'DatePicker' %}
+    {{ govukDateInput({
+        id: field.id,
+        namePrefix: field.name,
+        fieldset: {
+          legend: {
+            text: field.name,
+            isPageHeading: true
+          }
+        }
+      }) }}
+    {% endif %}
+
+    {% if field.code == 'Slider' %}
+    input range
+    {% endif %}
+
+    {% if field.code == 'ListBox' %}
+    
+    {% endif %}
+
+    {% if field.code == 'RadioGroup' %}
+    {{ govukRadios({
+        name: field.name,
+        fieldset: {
+          legend: {
+            text: field.label,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: "england",
+            text: "England"
+          },
+          {
+            value: "scotland",
+            text: "Scotland"
+          },
+          {
+            value: "wales",
+            text: "Wales"
+          },
+          {
+            value: "northern-ireland",
+            text: "Northern Ireland"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    {% if field.code == 'MultipleSelector' %}
+    {% endif %}
+
+    {% if field.code == 'MultipleInput' %}
+    {% endif %}
+
+    {% if field.code == 'Document' %}
+      {{ govukFileUpload({
+          id: field.id,
+          name: field.name,
+          label: {
+            text: field.label
+          }
+        }) }}
+    {% endif %}
+
+    {% if field.code == 'DocumentCollection' %}
+    {% endif %}
+
+  {% endfor %}
+{% endmacro %}

@@ -1,4 +1,3 @@
-const { server } = require("@hapi/hapi");
 const createServer = require("./server");
 
 const init = async () => {

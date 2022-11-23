@@ -1,0 +1,50 @@
+
+{% extends './layouts/layout.njk' %}
+
+{% block pageTitle %}
+  {{siteTitle}}
+{% endblock %}
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-main-wrapper--auto-spacing">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <form method="post" action="jbpm-communicator">
+            {{ govukCheckboxes({
+                name: "standardsSelection",
+                fieldset: {
+                  legend: {
+                    text: "Which standards do you want to apply for?",
+                    isPageHeading: true,
+                    classes: "govuk-fieldset__legend--l"
+                  }
+                },
+                hint: {
+                  text: "The standard(s) you are elligible for are shown below. Choose all that apply."
+                },
+                items: [
+                  {
+                    value: "ariableAndHorticulturalSoils",
+                    text: "Ariable and Horticultural soils",
+                    hint: {
+                      text: [
+                        "£22.00 of £40.00 per hectare per year based on what actions you do.",
+                        "Based on ..."
+                      ]
+                    }
+                  },
+                  {
+                    value: "improvedGrasslandSoils",
+                    text: "Improved Grassland soils"
+                  }
+                ]
+              }) }}
+            {{ govukButton({
+              text: "Save and continue"
+            }) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

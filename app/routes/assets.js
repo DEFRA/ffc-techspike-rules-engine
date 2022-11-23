@@ -1,18 +1,16 @@
-const urlPrefix = require('../config/server').urlPrefix
-const expiresIn = require('../config/cache').expiresIn
 module.exports = {
-  method: 'GET',
-  path: `${urlPrefix}/assets/{path*}`,
+  method: "GET",
+  path: "/assets/{path*}",
   options: {
+    auth: false,
     handler: {
       directory: {
-        path: ['app/assets/dist', 'node_modules/govuk-frontend/govuk/assets']
-      }
+        path: ["app/frontend/dist", "node_modules/govuk-frontend/govuk/assets"],
+        listing: true,
+      },
     },
     cache: {
-      expiresIn: expiresIn,
-      privacy: 'private'
+      privacy: "private",
     },
-    auth: false
-  }
-}
+  },
+};

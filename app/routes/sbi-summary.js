@@ -1,11 +1,9 @@
-const viewTemplate = "home";
+const viewTemplate = "sbi-summary";
 
 module.exports = {
   method: "GET",
-  path: "/",
+  path: "/sbi-summary",
   handler: (request, h) => {
-    //send BMI to jbpm endpoint and get list of land parcels
-
     return h.view(viewTemplate);
   },
 };
