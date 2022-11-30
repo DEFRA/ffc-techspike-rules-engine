@@ -8,14 +8,13 @@
 {% macro renderFields(fields) %}
   {% for field in fields %}
     {% if field.fieldType == 'HTML' %}
-      //just render the html
     {% endif %}
 
     {% if field.fieldType == 'TextBox' %}
       {{
         govukInput({
           id: field.fieldId,
-          name: field.fieldLabel,
+          name: field.fieldId,
           label: {
             text: field.fieldLabel
           }
@@ -26,7 +25,7 @@
     {% if field.fieldType == 'TextArea' %}
       {{
         govukTextarea({
-          name: field.fieldLabel,
+          name: field.fieldId,
           id: field.fieldId,
           label: {
             text: field.fieldLabel
@@ -45,7 +44,7 @@
           isPageHeading: true
         },
         id: field.fieldId,
-        name: field.fieldLabel,
+        name: field.fieldId,
         inputmode: "numeric",
         spellcheck: false
       }) }}
@@ -58,7 +57,7 @@
           isPageHeading: true
         },
         id: field.fieldId,
-        name: field.fieldLabel,
+        name: field.fieldId,
         inputmode: "numeric",
         spellcheck: false
       }) }}
@@ -66,7 +65,7 @@
 
     {% if field.fieldType == 'CheckBox' %}
     {{ govukCheckboxes({
-        name: field.fieldLabel,
+        name: field.fieldId,
         fieldset: {
           legend: {
             text: field.fieldLabel,
@@ -84,7 +83,7 @@
     {% if field.fieldType == 'DatePicker' %}
     {{ govukDateInput({
         id: field.fieldId,
-        namePrefix: field.fieldLabel,
+        namePrefix: field.fieldId,
         fieldset: {
           legend: {
             text: field.fieldLabel,
@@ -95,7 +94,6 @@
     {% endif %}
 
     {% if field.fieldType == 'Slider' %}
-    input range
     {% endif %}
 
     {% if field.fieldType == 'ListBox' %}
@@ -104,7 +102,7 @@
 
     {% if field.fieldType == 'RadioGroup' %}
     {{ govukRadios({
-        name: field.fieldLabel,
+        name: field.fieldId,
         fieldset: {
           legend: {
             text: field.fieldLabel,
@@ -125,7 +123,7 @@
     {% if field.fieldType == 'Document' %}
       {{ govukFileUpload({
           id: field.fieldId,
-          name: field.fieldLabel,
+          name: field.fieldId,
           label: {
             text: field.fieldLabel
           }
