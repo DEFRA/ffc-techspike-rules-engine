@@ -23,7 +23,9 @@ async function createServer() {
     require("./routes/standards-selection"),
     require("./routes/jbpm-communicator"),
     require("./routes/sbi-summary"),
-    require("./routes/application-summary")
+    require("./routes/application-summary"),
+    require("./routes/cannot-proceed"),
+    require("./routes/no-elligible-parcel")
   );
 
   await server.register(vision);

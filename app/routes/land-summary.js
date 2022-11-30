@@ -1,5 +1,6 @@
 const viewTemplate = "land-summary";
 const axios = require("axios");
+const { LAND_SUMMARY_URL } = require("../constants/endpoints");
 const endpoint = "https://loripsum.net/api/1/plaintext";
 
 const fakeResponse = {
@@ -28,7 +29,7 @@ const fakeResponse = {
 
 module.exports = {
   method: "GET",
-  path: "/land-summary",
+  path: `/${LAND_SUMMARY_URL}`,
   handler: async (request, h) => {
     return await axios
       .get(endpoint)
