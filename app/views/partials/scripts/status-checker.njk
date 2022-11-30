@@ -1,0 +1,7 @@
+<script type="text/javascript">
+  const timeOut = setInterval(async () => { 
+    await fetch('/status-checker')
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  }, 5000);
+</script>

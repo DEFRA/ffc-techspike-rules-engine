@@ -5,13 +5,14 @@
   {{siteTitle}}
 {% endblock %}
 {% block content %}
+  {% include "partials/scripts/status-checker.njk" %}
   <div class="govuk-width-container">
     <div class="govuk-main-wrapper--auto-spacing">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <form method="post" action="jbpm-communicator">
+          <form method="post" action="form">
             {{ govukCheckboxes({
-                name: "standardsSelection",
+                name: "selectedSchemes",
                 fieldset: {
                   legend: {
                     text: "Which standards do you want to apply for?",
@@ -24,7 +25,7 @@
                 },
                 items: [
                   {
-                    value: "ariableAndHorticulturalSoils",
+                    value: ARIABLE_LAND_SCHEME,
                     text: "Ariable and Horticultural soils",
                     hint: {
                       text: [
@@ -34,8 +35,11 @@
                     }
                   },
                   {
-                    value: "improvedGrasslandSoils",
+                    value: GRASSLAND_SCHEME,
                     text: "Improved Grassland soils"
+                  },{
+                    value:MOORLAND_SCHEME,
+                    text:'Moorlands'
                   }
                 ]
               }) }}
