@@ -7,16 +7,24 @@
   {{siteTitle}}
 {% endblock %}
 {% block content %}
+  {% include "partials/scripts/status-checker.njk" %}
   <div class="govuk-width-container">
     <div class="govuk-main-wrapper--auto-spacing">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h1 class="govuk-heading-xl">Dynamic form [{{ formId }}] (ariable form etc)</h1>
-        </div>
-        <div class="govuk-grid-column-two-thirds">
-
           <form method="POST" action="/jbpm-communicator" autocomplete="off" novalidate>
-            {{ renderFields(fields) }}
+
+            {% if(fields.shared) %}
+              {{ renderFields(fields.shared) }}
+            {% endif %}
+            
+            {% for key , value in fields %}
+              {% if (key != 'shared') %}
+              <h1 class="govuk-heading-xl">{{SCHEME_DISPLAY_DICTIONARY[key]}}</h1>
+              {{ renderFields(fields[key]) }}
+              {% endif %}
+            {% endfor %} 
+            
             {{ govukButton({
               text: "Save and continue"
             }) }}

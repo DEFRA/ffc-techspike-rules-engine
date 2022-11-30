@@ -1,3 +1,15 @@
+const { setYarValue, getYarValue } = require("../helpers/session");
+const {
+  ARIABLE_LAND_SCHEME,
+  GRASSLAND_SCHEME,
+  MOORLAND_SCHEME,
+  SCHEME_DISPLAY_DICTIONARY,
+} = require("../constants/services-dictionary");
+const {
+  SCHEME_SELECTION_URL,
+  DYNAMIC_FORM_URL,
+} = require("../constants/endpoints");
+
 const viewTemplate = "form";
 const containerID = 0;
 const tInstanceId = 0;
@@ -36,16 +48,93 @@ const fields = [
   },
 ];
 
-module.exports = {
-  method: "GET",
-  path: "/{formId}",
-  handler: async (request, h) => {
-    // return await fetch(endpoint)
-    //   .then((response) => response.json())
-    //   .then(({ fields }) => {
+module.exports = [
+  {
+    method: "GET",
+    path: `/${DYNAMIC_FORM_URL}`,
+    handler: async (request, h) => {
+      const selectedSchemes = getYarValue(request, "selectedSchemes");
 
-    return h.view(viewTemplate, { formId: request.params.formId, fields });
-    // })
-    // .catch((err) => console.log(err));
+      if (!selectedSchemes) {
+        return h.redirect(SCHEME_SELECTION_URL);
+      }
+      // return await fetch(endpoint)
+      //   .then((response) => response.json())
+      //   .then(({ fields }) => {
+      const decisionResults =
+        sampleResponse.result["dmn-evaluation-result"]["decision-results"];
+
+      let retrievedFields =
+        decisionResults[Object.keys(decisionResults)[0]].result;
+
+      let fields = { shared: [] };
+
+      // add items to combobox and radio groups
+      retrievedFields.forEach((retrievedField) => {
+        if (["CheckBox", "RadioGroup"].includes(retrievedField.fieldType)) {
+          retrievedField.items = retrievedField.choiceOptions
+            .split(";")
+            .map((option) => {
+              const options = option.split(":");
+
+              return {
+                value: options[0],
+                text: options[1],
+              };
+            });
+        }
+      });
+
+      // group fields by sections
+      if (
+        selectedSchemes &&
+        typeof selectedSchemes === "object" &&
+        selectedSchemes.length > 1
+      ) {
+        retrievedFields.forEach((retrievedField) => {
+          // assume that a field without applicable schemes belongs in shared category
+          if (retrievedField.applicableSchemes == null) {
+            fields.shared.push(retrievedField);
+            return;
+          }
+
+          // group fields base on scheme type
+          if (
+            retrievedField.applicableSchemes.length === 1
+          ) {
+            // if field only has one applicable scheme add it to its own section
+            if (!fields[retrievedField.applicableSchemes[0]]) {
+              fields[retrievedField.applicableSchemes[0]] = [];
+            }
+            fields[retrievedField.applicableSchemes[0]].push(retrievedField);
+            return;
+          }
+
+          fields.shared.push(retrievedField);
+        });
+      } else {
+        fields.shared = retrievedFields;
+      }
+
+      return h.view(viewTemplate, {
+        formId: request.params.formId,
+        fields,
+        SCHEME_DISPLAY_DICTIONARY,
+      });
+      // })
+    },
   },
-};
+  {
+    method: "POST",
+    path: `/${DYNAMIC_FORM_URL}`,
+    options: {
+      handler: async (request, h) => {
+        const { selectedSchemes } = request.payload;
+
+        setYarValue(request, "selectedSchemes", selectedSchemes);
+
+        return h.redirect(DYNAMIC_FORM_URL);
+      },
+    },
+  },
+];

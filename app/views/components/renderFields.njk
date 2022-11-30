@@ -7,29 +7,29 @@
 
 {% macro renderFields(fields) %}
   {% for field in fields %}
-    {% if field.code == 'HTML' %}
+    {% if field.fieldType == 'HTML' %}
       //just render the html
     {% endif %}
 
-    {% if field.code == 'TextBox' %}
+    {% if field.fieldType == 'TextBox' %}
       {{
         govukInput({
-          id: field.id,
-          name: field.name,
+          id: field.fieldId,
+          name: field.fieldLabel,
           label: {
-            text: field.label
+            text: field.fieldLabel
           }
         })
       }}
     {% endif %}
 
-    {% if field.code == 'TextArea' %}
+    {% if field.fieldType == 'TextArea' %}
       {{
         govukTextarea({
-          name: field.name,
-          id: field.id,
+          name: field.fieldLabel,
+          id: field.fieldId,
           label: {
-            text: field.label
+            text: field.fieldLabel
           },
           hint: {
             text: field.hint
@@ -38,29 +38,38 @@
       }}
     {% endif %}
     
-    {% if field.code == 'IntegerBox' %}
+    {% if field.fieldType == 'IntegerBox' %}
     {{ govukInput({
         label: {
-          text: field.name,
+          text: field.fieldLabel,
           isPageHeading: true
         },
-        id: field.id,
-        name: field.name,
+        id: field.fieldId,
+        name: field.fieldLabel,
         inputmode: "numeric",
         spellcheck: false
       }) }}
     {% endif %}
 
-    {% if field.code == 'DecimalBox' %}
-    number input with floats
+    {% if field.fieldType == 'DecimalBox' %}
+    {{ govukInput({
+        label: {
+          text: field.fieldLabel,
+          isPageHeading: true
+        },
+        id: field.fieldId,
+        name: field.fieldLabel,
+        inputmode: "numeric",
+        spellcheck: false
+      }) }}
     {% endif %}
 
-    {% if field.code == 'CheckBox' %}
+    {% if field.fieldType == 'CheckBox' %}
     {{ govukCheckboxes({
-        name: field.name,
+        name: field.fieldLabel,
         fieldset: {
           legend: {
-            text: field.label,
+            text: field.fieldLabel,
             isPageHeading: true,
             classes: "govuk-fieldset__legend--l"
           }
@@ -68,92 +77,62 @@
         hint: {
           text: "Select all that apply."
         },
-        items: [
-          {
-            value: "carcasses",
-            text: "Waste from animal carcasses"
-          },
-          {
-            value: "mines",
-            text: "Waste from mines or quarries"
-          },
-          {
-            value: "farm",
-            text: "Farm or agricultural waste"
-          }
-        ]
+        items: field.items
       }) }}
     {% endif %}
 
-    {% if field.code == 'DatePicker' %}
+    {% if field.fieldType == 'DatePicker' %}
     {{ govukDateInput({
-        id: field.id,
-        namePrefix: field.name,
+        id: field.fieldId,
+        namePrefix: field.fieldLabel,
         fieldset: {
           legend: {
-            text: field.name,
+            text: field.fieldLabel,
             isPageHeading: true
           }
         }
       }) }}
     {% endif %}
 
-    {% if field.code == 'Slider' %}
+    {% if field.fieldType == 'Slider' %}
     input range
     {% endif %}
 
-    {% if field.code == 'ListBox' %}
+    {% if field.fieldType == 'ListBox' %}
     
     {% endif %}
 
-    {% if field.code == 'RadioGroup' %}
+    {% if field.fieldType == 'RadioGroup' %}
     {{ govukRadios({
-        name: field.name,
+        name: field.fieldLabel,
         fieldset: {
           legend: {
-            text: field.label,
+            text: field.fieldLabel,
             isPageHeading: true,
             classes: "govuk-fieldset__legend--l"
           }
         },
-        items: [
-          {
-            value: "england",
-            text: "England"
-          },
-          {
-            value: "scotland",
-            text: "Scotland"
-          },
-          {
-            value: "wales",
-            text: "Wales"
-          },
-          {
-            value: "northern-ireland",
-            text: "Northern Ireland"
-          }
-        ]
+        items: field.items
       }) }}
     {% endif %}
 
-    {% if field.code == 'MultipleSelector' %}
+    {% if field.fieldType == 'MultipleSelector' %}
     {% endif %}
 
-    {% if field.code == 'MultipleInput' %}
+    {% if field.fieldType == 'MultipleInput' %}
     {% endif %}
 
-    {% if field.code == 'Document' %}
+    {% if field.fieldType == 'Document' %}
       {{ govukFileUpload({
-          id: field.id,
-          name: field.name,
+          id: field.fieldId,
+          name: field.fieldLabel,
           label: {
-            text: field.label
+            text: field.fieldLabel
           }
         }) }}
     {% endif %}
 
-    {% if field.code == 'DocumentCollection' %}
+    {% if field.fieldType == 'DocumentCollection' %}
     {% endif %}
 
   {% endfor %}
