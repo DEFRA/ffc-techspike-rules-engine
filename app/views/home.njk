@@ -16,6 +16,13 @@
           <h3 class="govuk-heading-s">Application incomplete</h3>
           <p class="govuk-body-l">You have completed X out of X sections</p>
 
+          <form action="/sbi" method="post">
+            <label class="govuk-label govuk-input__label">Please enter your SBI number
+              <input class="govuk-input" type="text" name="sbi" />
+            </label>
+            <input class="govuk-input" type="submit" value="Save" />
+          </form>
+
           <table class="govuk-table">
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">

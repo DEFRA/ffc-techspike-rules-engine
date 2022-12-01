@@ -1,61 +1,26 @@
 // const Joi = require("joi");
-const { setYarValue, getYarValue } = require("../helpers/session");
+const { LAND_SUMMARY_URL } = require("../constants/endpoints");
+const { setYarValue } = require("../helpers/session");
 
-const viewTemplate = "sbi";
-const sbiData = {
-  1: {
-    properties: [
-      {
-        name: "property 1",
+module.exports = {
+  method: "POST",
+  path: "/sbi",
+  options: {
+    validate: {
+      options: { abortEarly: false },
+      // payload: Joi.object({
+      //   sbiID: Joi.string().required(),
+      // }),
+      failAction: (request, h, err) => {
+        return "sbiID not supplied";
       },
-      {
-        name: "property 2",
-      },
-    ],
-  },
-  2: {
-    properties: [
-      {
-        name: "property 3",
-      },
-      {
-        name: "property 4",
-      },
-    ],
+    },
+    handler: async (request, h) => {
+      const { sbi } = request.payload;
+
+      setYarValue(request, "sbi", sbi);
+
+      return h.redirect(`/${LAND_SUMMARY_URL}`);
+    },
   },
 };
-
-module.exports = [
-  {
-    method: "GET",
-    path: "/sbi",
-    handler: (request, h) => {
-      const sbiID = getYarValue(request, "sbiID");
-      const properties = sbiData[sbiID].properties;
-
-      return h.view(viewTemplate, { properties, sbiID });
-    },
-  },
-  {
-    method: "POST",
-    path: "/sbi",
-    options: {
-      validate: {
-        options: { abortEarly: false },
-        // payload: Joi.object({
-        //   sbiID: Joi.string().required(),
-        // }),
-        failAction: (request, h, err) => {
-          return "sbiID not supplied";
-        },
-      },
-      handler: async (request, h) => {
-        const { sbiID } = request.payload;
-
-        setYarValue(request, "sbiID", sbiID);
-
-        return h.redirect("/sbi");
-      },
-    },
-  },
-];
