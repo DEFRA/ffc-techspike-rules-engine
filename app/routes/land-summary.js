@@ -18,9 +18,9 @@ module.exports = [
     handler: async (request, h) => {
       const sbi = getYarValue(request, "sbi");
 
-      if (!sbi) {
-        return h.redirect(`/${HOME_URL}`);
-      }
+      // if (!sbi) {
+      //   return h.redirect(`/${HOME_URL}`);
+      // }
 
       let totalParcels = 0;
       let totalLand = 0;
@@ -31,7 +31,7 @@ module.exports = [
           JBPM_START_POC_ELIGIBILITY_PROCESS,
           {
             sbi,
-            processPrefix: process.env.PROCESS_PREFIX,
+            processPrefix: process.env.PROCESS_SUFFIX,
           },
           AUTH_HEADER
         )
