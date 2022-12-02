@@ -19,7 +19,6 @@ async function createServer() {
     require("./routes/healthz"),
     require("./routes/home"),
     require("./routes/land-summary"),
-    require("./routes/sbi"),
     require("./routes/standards-selection"),
     require("./routes/jbpm-communicator"),
     require("./routes/sbi-summary"),

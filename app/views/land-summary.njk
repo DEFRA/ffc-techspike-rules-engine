@@ -26,10 +26,10 @@
             </ul>
           </p>
           <p class="govuk-body">Read <a href=''>Check your land details before you apply for an SFI standards agreement</a> on GOV.UK for more information.</p>
-          {{ renderFields(questionsList)}}
         </div>
         <div class="govuk-grid-column-two-thirds">
-          <form method="post" action="jbpm-communicator">
+          <form method="post" action="/jbpm-communicator">
+            {{ renderFields(questionsList)}}
             {{ govukButton({
               text: "Save and continue"
             }) }}
