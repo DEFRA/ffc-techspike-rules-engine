@@ -20,8 +20,7 @@ module.exports = [
     handler: async (request, h) => {
       const sbi = getYarValue(request, 'sbi')
 
-      const redirectUrl =
-        `${process.env.BASE_URL}` + (await jbpmCheckExistingProcesses(sbi))
+      const redirectUrl = await jbpmCheckExistingProcesses(sbi)
 
       return {
         redirectUrl
@@ -48,7 +47,7 @@ module.exports = [
           return h.redirect(redirectUrl)
         }
         case LAND_SUMMARY_URL: {
-          const jbpmProcessId = getYarValue(request, 'jbpmProcessId')
+          const jbpmTaskId = getYarValue(request, 'jbpmTaskId')
 
           const data = {
             summaryAnswerList: Object.keys(request.payload).map((key) => ({
@@ -57,13 +56,9 @@ module.exports = [
             }))
           }
 
-          const answerSaved = await jbpmSaveAnswer(jbpmProcessId, data)
+          await jbpmSaveAnswer(jbpmTaskId, data)
 
-          if (answerSaved) {
-            redirectUrl = PROCESS_PENDING_URL
-          }
-
-          redirectUrl = HOME_URL
+          redirectUrl = PROCESS_PENDING_URL
           break
         }
 
@@ -72,7 +67,7 @@ module.exports = [
           break
 
         case DYNAMIC_FORM_URL: {
-          const jbpmProcessId = getYarValue(request, 'jbpmProcessId')
+          const jbpmTaskId = getYarValue(request, 'jbpmTaskId')
 
           const data = {
             summaryAnswerList: Object.keys(request.payload).map((key) => ({
@@ -81,7 +76,7 @@ module.exports = [
             }))
           }
 
-          await jbpmSaveAnswer(jbpmProcessId, data)
+          await jbpmSaveAnswer(jbpmTaskId, data)
 
           redirectUrl = SBI_SUMMARY_URL
           break

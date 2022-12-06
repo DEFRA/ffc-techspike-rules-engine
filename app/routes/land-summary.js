@@ -22,8 +22,10 @@ module.exports = [
 
       const inProgressProcess = await jbpmLoadInProgressProcess(jbpmProcessId)
 
-      const { totalParcels, totalLand, totals, questionsList } =
+      const { totalParcels, totalLand, totals, questionsList, jbpmTaskId } =
         inProgressProcess
+
+      setYarValue(request, 'jbpmTaskId', jbpmTaskId)
 
       return h.view('land-summary', {
         totalParcels,

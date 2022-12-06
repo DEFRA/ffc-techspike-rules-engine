@@ -60,12 +60,14 @@ const jbpmLoadInProgressProcess = async (sbi) => {
   const totals = {}
   const questionsList = []
   let schemes = []
+  let jbpmTaskId = null
 
   await axios
     .get(JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS(sbi), AUTH_HEADER)
     .then((response) => {
       const { landList, summaryQuestionList, schemeEligibilityListP } =
         response.data['process-instance-variables']
+      jbpmTaskId = response.data['active-user-tasks']['task-summary'].filter(task => task['task-name'] === 'Get Summary Answer')[0]['task-id']
 
       parseString(summaryQuestionList, (err, result) => {
         if (err) {
@@ -119,16 +121,16 @@ const jbpmLoadInProgressProcess = async (sbi) => {
       })
     })
 
-  return { totalParcels, totalLand, totals, questionsList, schemes }
+  return { totalParcels, totalLand, totals, questionsList, schemes, jbpmTaskId }
 }
 
-const jbpmSaveAnswer = async (jbpmProcessId, data) => {
-  if (!jbpmProcessId) {
+const jbpmSaveAnswer = async (jbpmTaskId, data) => {
+  if (!jbpmTaskId) {
     return false
   }
 
   const res = await axios
-    .put(JBPM_COMPLETE_SUMMARY_ANSWER(jbpmProcessId), data, AUTH_HEADER)
+    .put(JBPM_COMPLETE_SUMMARY_ANSWER(jbpmTaskId), data, AUTH_HEADER)
     .catch((err) => {
       console.log(err)
     })
@@ -149,12 +151,13 @@ const jbpmCheckExistingProcesses = async (sbi) => {
     .reverse()[0]
 
   // handle  latestRunningInstace["process-instance-state" undefined
+  const jbpmProcessId = latestRunningInstace['process-instance-id']
 
-  const responseData = jbpmGetProcessStatus(
-    latestRunningInstace['process-instance-id']
+  const responseData = await jbpmGetProcessStatus(
+    jbpmProcessId
   )
 
-  const redirectUrl = jbpmLatestProcessRunningInstance(
+  const redirectUrl = await jbpmLatestProcessRunningInstance(
     latestRunningInstace,
     responseData
   )
@@ -183,14 +186,14 @@ const jbpmGetProcessStatus = async (sbi) =>
       return parsedResponse
     })
 
-const jbpmLatestProcessRunningInstance = (
+const jbpmLatestProcessRunningInstance = async (
   latestRunningInstace,
   responseData
 ) => {
   let redirectUrl = `${LAND_SUMMARY_URL}`
 
   if (typeof latestRunningInstace['process-instance-state'] === 'undefined') {
-    jbpmStartEligibilityProcess()
+    await jbpmStartEligibilityProcess()
     redirectUrl = PROCESS_PENDING_URL
   }
 
@@ -214,12 +217,12 @@ const jbpmLatestProcessRunningInstance = (
 
     case COMPLETED:
       if (!responseData?.leastOneParcelEligible) {
-        jbpmStartEligibilityProcess()
+        await jbpmStartEligibilityProcess()
         redirectUrl = PROCESS_PENDING_URL
       }
 
       if (!responseData?.validSummaryAnswers) {
-        jbpmStartEligibilityProcess()
+        await jbpmStartEligibilityProcess()
         redirectUrl = PROCESS_PENDING_URL
       }
 
