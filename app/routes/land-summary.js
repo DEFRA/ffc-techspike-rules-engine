@@ -11,6 +11,11 @@ module.exports = [
     path: `/${LAND_SUMMARY_URL}`,
     handler: async (request, h) => {
       const sbi = getYarValue(request, "sbi");
+
+      if (!sbi) {
+        return "Please return to start and enter SBI";
+      }
+
       const jbpmProcessId = await jbpmStartEligibilityProcess(sbi);
 
       setYarValue(request, "jbpmProcessId", jbpmProcessId);
