@@ -5,13 +5,13 @@
   {{siteTitle}}
 {% endblock %}
 {% block content %}
-  {% include "partials/scripts/status-checker.njk" %}
   <div class="govuk-width-container">
     <div class="govuk-main-wrapper--auto-spacing">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
           <form method="post" action="form">
-            {{ govukCheckboxes({
+            
+            {{  govukCheckboxes({
                 name: "selectedSchemes",
                 fieldset: {
                   legend: {
@@ -23,26 +23,9 @@
                 hint: {
                   text: "The standard(s) you are elligible for are shown below. Choose all that apply."
                 },
-                items: [
-                  {
-                    value: ARIABLE_LAND_SCHEME,
-                    text: "Ariable and Horticultural soils",
-                    hint: {
-                      text: [
-                        "£22.00 of £40.00 per hectare per year based on what actions you do.",
-                        "Based on ..."
-                      ]
-                    }
-                  },
-                  {
-                    value: GRASSLAND_SCHEME,
-                    text: "Improved Grassland soils"
-                  },{
-                    value:MOORLAND_SCHEME,
-                    text:'Moorlands'
-                  }
-                ]
+                items: availableSchemes
               }) }}
+            
             {{ govukButton({
               text: "Save and continue"
             }) }}

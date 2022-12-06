@@ -59,11 +59,12 @@ const jbpmLoadInProgressProcess = async (sbi) => {
   let totalLand = 0;
   const totals = {};
   const questionsList = [];
+  let schemes = [];
 
   await axios
     .get(JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS(sbi), AUTH_HEADER)
     .then((response) => {
-      const { landList, summaryQuestionList } =
+      const { landList, summaryQuestionList, schemeEligibilityListP } =
         response.data["process-instance-variables"];
 
       parseString(summaryQuestionList, (err, result) => {
@@ -106,9 +107,19 @@ const jbpmLoadInProgressProcess = async (sbi) => {
           totals[groupName].hectares += +parcelArea;
         });
       });
+
+      parseString(schemeEligibilityListP, (err, result) => {
+        if (err) {
+          return;
+        }
+
+        schemes = result.schemeEligibilityList.schemeEligibilityList
+          .filter((scheme) => scheme.eligibility.includes("true"))
+          .map((scheme) => scheme.eligibleScheme[0]);
+      });
     });
 
-  return { totalParcels, totalLand, totals, questionsList };
+  return { totalParcels, totalLand, totals, questionsList, schemes };
 };
 
 const jbpmSaveAnswer = async (jbpmProcessId, data) => {
