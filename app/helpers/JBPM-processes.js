@@ -141,7 +141,7 @@ const jbpmCheckExistingProcesses = async (sbi) => {
 
   if (!runningInstances && !runningInstances.length) {
     await jbpmStartEligibilityProcess()
-    return h.redirect(PROCESS_PENDING_URL)
+    return PROCESS_PENDING_URL
   }
 
   const latestRunningInstace = runningInstances
@@ -151,7 +151,7 @@ const jbpmCheckExistingProcesses = async (sbi) => {
   // handle  latestRunningInstace["process-instance-state" undefined
 
   const responseData = jbpmGetProcessStatus(
-    474 /* latestRunningInstace["process-instance-id"] */
+    latestRunningInstace['process-instance-id']
   )
 
   const redirectUrl = jbpmLatestProcessRunningInstance(
@@ -187,7 +187,7 @@ const jbpmLatestProcessRunningInstance = (
   latestRunningInstace,
   responseData
 ) => {
-  let redirectUrl = `/${LAND_SUMMARY_URL}`
+  let redirectUrl = `${LAND_SUMMARY_URL}`
 
   if (typeof latestRunningInstace['process-instance-state'] === 'undefined') {
     jbpmStartEligibilityProcess()
@@ -208,7 +208,7 @@ const jbpmLatestProcessRunningInstance = (
         typeof latestRunningInstace !== 'undefined' &&
         latestRunningInstace['task-id']
       ) {
-        redirectUrl = `/${LAND_SUMMARY_URL}`
+        redirectUrl = `${LAND_SUMMARY_URL}`
       }
       break
 

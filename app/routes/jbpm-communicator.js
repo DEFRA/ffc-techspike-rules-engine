@@ -9,8 +9,7 @@ const {
 } = require('../constants/endpoints')
 const {
   jbpmSaveAnswer,
-  jbpmCheckExistingProcesses,
-  jbpmCheckProcessStatus
+  jbpmCheckExistingProcesses
 } = require('../helpers/JBPM-processes')
 const { setYarValue, getYarValue } = require('../helpers/session')
 
@@ -19,13 +18,13 @@ module.exports = [
     method: 'GET',
     path: '/jbpm-status-checker',
     handler: async (request, h) => {
-      // const jbpmProcessId = getYarValue(request, "jbpmProcessId");
       const sbi = getYarValue(request, 'sbi')
 
-      const response = await jbpmCheckProcessStatus(474)
+      const redirectUrl =
+        `${process.env.BASE_URL}` + (await jbpmCheckExistingProcesses(sbi))
 
       return {
-        redirectUrl: 'qwer'
+        redirectUrl
       }
     }
   },
