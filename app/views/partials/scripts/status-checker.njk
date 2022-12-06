@@ -1,7 +1,9 @@
 <script type="text/javascript">
   const timeOut = setInterval(async () => { 
-    await fetch('/status-checker')
+     fetch('/jbpm-status-checker')
       .then((response) => response.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        window.location = data.redirectUrl
+      });
   }, 5000);
 </script>
