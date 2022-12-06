@@ -25,6 +25,8 @@ const JBPM_SEARCH_PROCESS_BY_IDENTIFIER = (sbi, statuses) => {
 const JBPM_COMPLETE_SUMMARY_ANSWER = (taskId) =>
   `${process.env.JBPM_URL}/kie-server/services/rest/server/containers/${process.env.POC_CONTAINER_ID}/tasks/${taskId}/states/completed?auto-progress=true&user=katy`;
 
+const JBPM_DMN_SCHEME_TEMPLATES = `${process.env.JBPM_URL}/kie-server/services/rest/server/containers/${process.env.POC_CONTAINER_ID}/dmn`;
+
 const AUTH_HEADER = {
   auth: {
     username: process.env.REST_USERNAME,
@@ -48,4 +50,5 @@ module.exports = {
   JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS,
   JBPM_SEARCH_PROCESS_BY_IDENTIFIER,
   JBPM_COMPLETE_SUMMARY_ANSWER,
+  JBPM_DMN_SCHEME_TEMPLATES,
 };

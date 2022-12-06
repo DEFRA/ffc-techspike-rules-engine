@@ -1,52 +1,17 @@
 const { setYarValue, getYarValue } = require("../helpers/session");
 const {
-  ARIABLE_LAND_SCHEME,
-  GRASSLAND_SCHEME,
-  MOORLAND_SCHEME,
-  SCHEME_DISPLAY_DICTIONARY,
+  SCHEME_DISPLAY_NAME_DICTIONARY,
 } = require("../constants/services-dictionary");
 const {
   SCHEME_SELECTION_URL,
   DYNAMIC_FORM_URL,
+  JBPM_DMN_SCHEME_TEMPLATES,
+  AUTH_HEADER,
 } = require("../constants/endpoints");
+const { generateChoiceOptions } = require("../helpers/generateChoiceOptions");
+const axios = require("axios");
 
 const viewTemplate = "form";
-const containerID = 0;
-const tInstanceId = 0;
-const endpoint = `server/containers/${containerID}/forms/tasks/${tInstanceId}`;
-
-const fields = [
-  {
-    placeHolder: "Reason",
-    rows: 4,
-    id: "field_332058348325587E12",
-    name: "reason",
-    label: "Reason",
-    required: false,
-    readOnly: true,
-    validateOnChange: true,
-    binding: "reason",
-    standaloneClassName: "java.lang.String",
-    code: "TextArea",
-    serializedFieldClassName:
-      "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textArea.definition.TextAreaFieldDefinition",
-  },
-  {
-    placeHolder: "Performance",
-    maxLength: 100,
-    id: "field_336003622256354E12",
-    name: "performance",
-    label: "Performance",
-    required: true,
-    readOnly: false,
-    validateOnChange: true,
-    binding: "performance",
-    standaloneClassName: "java.lang.Integer",
-    code: "IntegerBox",
-    serializedFieldClassName:
-      "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.integerBox.definition.IntegerBoxFieldDefinition",
-  },
-];
 
 module.exports = [
   {
@@ -58,70 +23,91 @@ module.exports = [
       if (!selectedSchemes) {
         return h.redirect(SCHEME_SELECTION_URL);
       }
-      // return await fetch(endpoint)
-      //   .then((response) => response.json())
-      //   .then(({ fields }) => {
-      const decisionResults =
-        sampleResponse.result["dmn-evaluation-result"]["decision-results"];
 
-      let retrievedFields =
-        decisionResults[Object.keys(decisionResults)[0]].result;
+      return await axios
+        .post(
+          JBPM_DMN_SCHEME_TEMPLATES,
+          {
+            "model-namespace":
+              "https://kiegroup.org/dmn/_004C4682-598B-4815-B2F9-781D6F4F6E3E",
+            "model-name": "SchemeListTemplateFields",
+            "decision-name": "SchemeListTemplateFields",
+            "dmn-context": {
+              SchemeListInput: { selectedSchemes },
+            },
+          },
+          AUTH_HEADER
+        )
+        .then((response) => {
+          const decisionResults =
+            response.data["result"]["dmn-evaluation-result"][
+              "decision-results"
+            ];
 
-      let fields = { shared: [] };
+          let retrievedFields =
+            decisionResults[Object.keys(decisionResults)[0]].result;
 
-      // add items to combobox and radio groups
-      retrievedFields.forEach((retrievedField) => {
-        if (["CheckBox", "RadioGroup"].includes(retrievedField.fieldType)) {
-          retrievedField.items = retrievedField.choiceOptions
-            .split(";")
-            .map((option) => {
-              const options = option.split(":");
-
-              return {
-                value: options[0],
-                text: options[1],
-              };
-            });
-        }
-      });
-
-      // group fields by sections
-      if (
-        selectedSchemes &&
-        typeof selectedSchemes === "object" &&
-        selectedSchemes.length > 1
-      ) {
-        retrievedFields.forEach((retrievedField) => {
-          // assume that a field without applicable schemes belongs in shared category
-          if (retrievedField.applicableSchemes == null) {
-            fields.shared.push(retrievedField);
-            return;
+          if (typeof retrievedFields.length === "undefined") {
+            const originalRetrievedFields = retrievedFields;
+            retrievedFields = [];
+            retrievedFields.push(originalRetrievedFields);
           }
 
-          // group fields base on scheme type
+          const fields = { shared: [] };
+
+          // add items to combobox and radio groups
+          retrievedFields.forEach((retrievedField) => {
+            generateChoiceOptions(retrievedField);
+          });
+
+          // group fields by sections
           if (
-            retrievedField.applicableSchemes.length === 1
+            selectedSchemes &&
+            typeof selectedSchemes === "object" &&
+            selectedSchemes.length > 1
           ) {
-            // if field only has one applicable scheme add it to its own section
-            if (!fields[retrievedField.applicableSchemes[0]]) {
-              fields[retrievedField.applicableSchemes[0]] = [];
-            }
-            fields[retrievedField.applicableSchemes[0]].push(retrievedField);
-            return;
+            retrievedFields.forEach((retrievedField) => {
+              // assume that a field without applicable schemes belongs in shared category
+              if (retrievedField.applicableSchemes == null) {
+                fields.shared.push(retrievedField);
+                return;
+              }
+
+              // if every applicable scheme is in the selected schemes list add it to a shared section
+              // if (
+              //   retrievedField.applicableSchemes.length > 1 &&
+              //   retrievedField.applicableSchemes.every((applicableScheme) =>
+              //     selectedSchemes.includes(applicableScheme)
+              //   )
+              // ) {
+              //   fields.shared.push(retrievedField);
+              //   return;
+              // }
+
+              // group fields base on scheme type
+              if (retrievedField.applicableSchemes.length === 1) {
+                // if field only has one applicable scheme add it to its own section
+                if (!fields[retrievedField.applicableSchemes[0]]) {
+                  fields[retrievedField.applicableSchemes[0]] = [];
+                }
+                fields[retrievedField.applicableSchemes[0]].push(
+                  retrievedField
+                );
+                return;
+              }
+
+              fields.shared.push(retrievedField);
+            });
+          } else {
+            fields.shared = retrievedFields;
           }
 
-          fields.shared.push(retrievedField);
+          return h.view(viewTemplate, {
+            formId: request.params.formId,
+            fields,
+            SCHEME_DISPLAY_NAME_DICTIONARY,
+          });
         });
-      } else {
-        fields.shared = retrievedFields;
-      }
-
-      return h.view(viewTemplate, {
-        formId: request.params.formId,
-        fields,
-        SCHEME_DISPLAY_DICTIONARY,
-      });
-      // })
     },
   },
   {
