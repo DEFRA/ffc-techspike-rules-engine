@@ -1,61 +1,61 @@
-const Hapi = require("@hapi/hapi");
-const nunjucks = require("nunjucks");
-const vision = require("@hapi/vision");
-const path = require("path");
+const Hapi = require('@hapi/hapi')
+const nunjucks = require('nunjucks')
+const vision = require('@hapi/vision')
+const path = require('path')
 
-require("dotenv").config();
+require('dotenv').config()
 
-async function createServer() {
+async function createServer () {
   const server = Hapi.server({
-    port: process.env.PORT,
-  });
+    port: process.env.PORT
+  })
 
-  await server.register(require("@hapi/inert"));
+  await server.register(require('@hapi/inert'))
 
   const routes = [].concat(
-    require("./routes/assets"),
-    require("./routes/form"),
-    require("./routes/healthy"),
-    require("./routes/healthz"),
-    require("./routes/home"),
-    require("./routes/land-summary"),
-    require("./routes/standards-selection"),
-    require("./routes/jbpm-communicator"),
-    require("./routes/sbi-summary"),
-    require("./routes/application-summary"),
-    require("./routes/cannot-proceed"),
-    require("./routes/no-elligible-parcel"),
-    require("./routes/process-pending")
-  );
+    require('./routes/assets'),
+    require('./routes/form'),
+    require('./routes/healthy'),
+    require('./routes/healthz'),
+    require('./routes/home'),
+    require('./routes/land-summary'),
+    require('./routes/standards-selection'),
+    require('./routes/jbpm-communicator'),
+    require('./routes/sbi-summary'),
+    require('./routes/application-summary'),
+    require('./routes/cannot-proceed'),
+    require('./routes/no-elligible-parcel'),
+    require('./routes/process-pending')
+  )
 
-  await server.register(vision);
+  await server.register(vision)
 
-  await server.register(require("./plugins/session"));
+  await server.register(require('./plugins/session'))
 
-  server.route(routes);
+  server.route(routes)
 
   server.views({
     engines: {
       njk: {
         compile: (src, options) => {
-          const template = nunjucks.compile(src, options.environment);
-          return (context) => template.render(context);
+          const template = nunjucks.compile(src, options.environment)
+          return (context) => template.render(context)
         },
         prepare: (options, next) => {
           options.compileOptions.environment = nunjucks.configure(
             [
-              "node_modules/govuk-frontend/",
-              path.join(options.relativeTo || process.cwd(), options.path),
+              'node_modules/govuk-frontend/',
+              path.join(options.relativeTo || process.cwd(), options.path)
             ],
             {
               autoescape: true,
-              watch: false,
+              watch: false
             }
-          );
+          )
 
-          return next();
-        },
-      },
+          return next()
+        }
+      }
     },
     relativeTo: __dirname,
     // compileOptions: {
@@ -65,16 +65,16 @@ async function createServer() {
     //     "node_modules/govuk-frontend/",
     //   ]),
     // },
-    path: "./views",
+    path: './views',
     context: {
-      assetpath: "/assets",
-      govukAssetpath: "/assets", //frontend/dist
-      serviceName: "Rules engine POC",
-      pageTitle: "Rules engine POC",
-    },
-  });
+      assetpath: '/assets',
+      govukAssetpath: '/assets', // frontend/dist
+      serviceName: 'Rules engine POC',
+      pageTitle: 'Rules engine POC'
+    }
+  })
 
-  return server;
+  return server
 }
 
-module.exports = createServer;
+module.exports = createServer

@@ -1,9 +1,9 @@
-const { PROCESS_PENDING_URL } = require("../constants/endpoints");
+const { PROCESS_PENDING_URL } = require('../constants/endpoints')
 
 module.exports = {
-  method: "GET",
+  method: 'GET',
   path: `/${PROCESS_PENDING_URL}`,
   handler: (request, h) => {
-    return h.view("process-pending");
-  },
-};
+    return h.view('process-pending')
+  }
+}

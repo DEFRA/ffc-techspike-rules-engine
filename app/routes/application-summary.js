@@ -1,11 +1,11 @@
-const { APPLICATION_SUMMARY_URL } = require("../constants/endpoints");
+const { APPLICATION_SUMMARY_URL } = require('../constants/endpoints')
 
-const viewTemplate = "application-summary";
+const viewTemplate = 'application-summary'
 
 module.exports = {
-  method: "GET",
+  method: 'GET',
   path: `/${APPLICATION_SUMMARY_URL}`,
   handler: (request, h) => {
-    return h.view(viewTemplate);
-  },
-};
+    return h.view(viewTemplate)
+  }
+}

@@ -1,13 +1,13 @@
-const { HOME_URL } = require("../constants/endpoints");
+const { HOME_URL } = require('../constants/endpoints')
 
-const viewTemplate = "home";
+const viewTemplate = 'home'
 
 module.exports = {
-  method: "GET",
+  method: 'GET',
   path: `/${HOME_URL}`,
   handler: (request, h) => {
-    //send BMI to jbpm endpoint and get list of land parcels
+    // send BMI to jbpm endpoint and get list of land parcels
 
-    return h.view(viewTemplate);
-  },
-};
+    return h.view(viewTemplate)
+  }
+}
