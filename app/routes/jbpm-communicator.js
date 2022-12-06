@@ -72,10 +72,21 @@ module.exports = [
           redirectUrl = DYNAMIC_FORM_URL;
           break;
 
-        case DYNAMIC_FORM_URL:
+        case DYNAMIC_FORM_URL: {
+          const jbpmProcessId = getYarValue(request, "jbpmProcessId");
+
+          const data = {
+            summaryAnswerList: Object.keys(request.payload).map((key) => ({
+              answer: request.payload[key],
+              id: key,
+            })),
+          };
+
+          await jbpmSaveAnswer(jbpmProcessId, data);
+
           redirectUrl = SBI_SUMMARY_URL;
           break;
-
+        }
         case SBI_SUMMARY_URL:
           redirectUrl = APPLICATION_SUMMARY_URL;
           break;
