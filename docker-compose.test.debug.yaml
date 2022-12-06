@@ -1,5 +1,5 @@
 services:
-  rules-engine-poc-jbpm:
+  ffc-techspike-rules-engine:
     command: npm run test:debug
     ports:
       - "9229:9229"

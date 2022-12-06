@@ -2,11 +2,11 @@
 # that test output is saved to the host
 
 services:
-  rules-engine-poc-jbpm:
+  ffc-techspike-rules-engine:
     build:
       target: development
-    image: rules-engine-poc-jbpm-development
-    container_name: rules-engine-poc-jbpm-test
+    image: ffc-techspike-rules-engine-development
+    container_name: ffc-techspike-rules-engine-test
     command: npm run test
     volumes:
       - ./app:/home/node/app

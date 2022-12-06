@@ -1,8 +1,8 @@
-{{- include "ffc-helm-library.deployment" (list . "rules-engine-poc-jbpm.deployment") -}}
-{{- define "rules-engine-poc-jbpm.deployment" -}}
+{{- include "ffc-helm-library.deployment" (list . "ffc-techspike-rules-engine.deployment") -}}
+{{- define "ffc-techspike-rules-engine.deployment" -}}
 spec:
   template:
     spec:
       containers:
-      - {{ include "ffc-helm-library.container" (list . "rules-engine-poc-jbpm.container") }}
+      - {{ include "ffc-helm-library.container" (list . "ffc-techspike-rules-engine.container") }}
 {{- end -}}

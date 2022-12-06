@@ -1,9 +1,9 @@
 environment: production
 environmentCode:
-name: rules-engine-poc-jbpm
+name: ffc-techspike-rules-engine
 namespace: rules-engine
 workstream: rules-engine
-image: rules-engine-poc-jbpm
+image: ffc-techspike-rules-engine
 
 labels:
   component: service
@@ -12,10 +12,10 @@ appInsights:
   key:
 
 containerConfigMap:
-  name: rules-engine-poc-jbpm-config-map
+  name: ffc-techspike-rules-engine-config-map
 
 containerSecret:
-  name: rules-engine-poc-jbpm-container-secret
+  name: ffc-techspike-rules-engine-container-secret
   type: Opaque
 
 deployment: {}

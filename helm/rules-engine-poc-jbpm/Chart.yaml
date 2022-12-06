@@ -1,9 +1,9 @@
 apiVersion: v2
 description: A proof of concept node js app that utilizes a JBPM service
-name: rules-engine-poc-jbpm
+name: ffc-techspike-rules-engine
 # this version is automatically updated in the build pipeline
 version: 1.0.0
 dependencies:
-- name: ffc-helm-library
-  version: 3.4.0
-  repository: https://raw.githubusercontent.com/defra/ffc-helm-repository/master/
+  - name: ffc-helm-library
+    version: 3.4.0
+    repository: https://raw.githubusercontent.com/defra/ffc-helm-repository/master/

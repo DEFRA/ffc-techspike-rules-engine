@@ -1,5 +1,5 @@
 services:
-  rules-engine-poc-jbpm:
+  ffc-techspike-rules-engine:
     command: >
       sh -c "npm run test:watch"
     volumes:
