@@ -24,7 +24,8 @@ async function createServer() {
     require("./routes/sbi-summary"),
     require("./routes/application-summary"),
     require("./routes/cannot-proceed"),
-    require("./routes/no-elligible-parcel")
+    require("./routes/no-elligible-parcel"),
+    require("./routes/process-pending")
   );
 
   await server.register(vision);

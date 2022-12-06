@@ -3,10 +3,14 @@ const parseString = require("xml2js").parseString;
 
 const {
   JBPM_START_ELIGIBILITY_PROCESS,
-  JBPM_LOAD_IN_PROGRESS_PROCESS,
+  JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS,
   AUTH_HEADER,
   JBPM_SEARCH_PROCESS_BY_IDENTIFIER,
   JBPM_COMPLETE_SUMMARY_ANSWER,
+  LAND_SUMMARY_URL,
+  PROCESS_PENDING_URL,
+  SCHEME_SELECTION_URL,
+  JBPM_LOAD_IN_PROGRESS_PROCESS,
 } = require("../constants/endpoints");
 const {
   PENDING,
@@ -46,8 +50,8 @@ const jbpmStartEligibilityProcess = async (sbi) =>
     .then(async (response) => {
       return response.data;
     })
-    .catch(function (error) {
-      console.log(error);
+    .catch(function (err) {
+      console.log(err);
     });
 
 const jbpmLoadInProgressProcess = async (sbi) => {
@@ -57,7 +61,7 @@ const jbpmLoadInProgressProcess = async (sbi) => {
   const questionsList = [];
 
   await axios
-    .get(JBPM_LOAD_IN_PROGRESS_PROCESS(sbi), AUTH_HEADER)
+    .get(JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS(sbi), AUTH_HEADER)
     .then((response) => {
       const { landList, summaryQuestionList } =
         response.data["process-instance-variables"];
@@ -67,13 +71,14 @@ const jbpmLoadInProgressProcess = async (sbi) => {
           return;
         }
         result.summaryQuestionList.summaryQuestionList.forEach(
-          ({ choiceOptions, fieldType, id, text }) => {
+          ({ choiceOptions, expectedAnswer, fieldType, id, text }) => {
             questionsList.push(
               generateChoiceOptions({
                 choiceOptions: choiceOptions[0],
                 fieldType: fieldType[0],
                 fieldId: id[0],
                 fieldLabel: text[0],
+                // expectedAnswer
               })
             );
           }
@@ -106,19 +111,120 @@ const jbpmLoadInProgressProcess = async (sbi) => {
   return { totalParcels, totalLand, totals, questionsList };
 };
 
-const jbpmSaveAnswer = async (taskId, data) => {
-  await axios.put(JBPM_COMPLETE_SUMMARY_ANSWER(taskId), data, AUTH_HEADER);
+const jbpmSaveAnswer = async (jbpmProcessId, data) => {
+  if (!jbpmProcessId) {
+    return false;
+  }
+
+  const res = await axios
+    .put(JBPM_COMPLETE_SUMMARY_ANSWER(jbpmProcessId), data, AUTH_HEADER)
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return res;
 };
 
-const jbpmStartNewProcess = () => {};
+const jbpmCheckExistingProcesses = async (sbi) => {
+  const runningInstances = await jbpmSearchProcessByIdentifier(sbi);
 
-const jbpmCreateNewProcess = () => {};
+  if (!runningInstances && !runningInstances.length) {
+    await jbpmStartEligibilityProcess();
+    return h.redirect(PROCESS_PENDING_URL);
+  }
+
+  const latestRunningInstace = runningInstances
+    .sort((a, b) => new Date(a["start-date"]) - new Date(b["start-date"]))
+    .reverse()[0];
+
+  //handle  latestRunningInstace["process-instance-state" undefined
+
+  const responseData = jbpmGetProcessStatus(
+    474 /*latestRunningInstace["process-instance-id"]*/
+  );
+
+  const redirectUrl = jbpmLatestProcessRunningInstance(
+    latestRunningInstace,
+    responseData
+  );
+
+  return redirectUrl;
+};
+
+const jbpmGetProcessStatus = async (sbi) =>
+  await axios
+    .get(JBPM_LOAD_IN_PROGRESS_PROCESS(sbi), AUTH_HEADER)
+    .then((response) => {
+      const parsedResponse = {};
+
+      response.data["variable-instance"].forEach((statusData) => {
+        if (
+          [
+            "leastOneParcelEligible",
+            "validSummaryAnswers",
+            "parcelDetailsReceived",
+          ].includes(statusData.name)
+        ) {
+          parsedResponse[statusData.name] = statusData.value;
+        }
+      });
+
+      return parsedResponse;
+    });
+
+const jbpmLatestProcessRunningInstance = (
+  latestRunningInstace,
+  responseData
+) => {
+  let redirectUrl = `/${LAND_SUMMARY_URL}`;
+
+  if (typeof latestRunningInstace["process-instance-state"] === "undefined") {
+    jbpmStartEligibilityProcess();
+    redirectUrl = PROCESS_PENDING_URL;
+  }
+
+  switch (latestRunningInstace["process-instance-state"]) {
+    case PENDING:
+      redirectUrl = PROCESS_PENDING_URL;
+      break;
+
+    case ACTIVE:
+      if (!responseData?.parcelDetailsReceived) {
+        redirectUrl = PROCESS_PENDING_URL;
+      }
+
+      if (
+        typeof latestRunningInstace !== "undefined" &&
+        latestRunningInstace["task-id"]
+      ) {
+        redirectUrl = `/${LAND_SUMMARY_URL}`;
+      }
+      break;
+
+    case COMPLETED:
+      if (!responseData?.leastOneParcelEligible) {
+        jbpmStartEligibilityProcess();
+        redirectUrl = PROCESS_PENDING_URL;
+      }
+
+      if (!responseData?.validSummaryAnswers) {
+        jbpmStartEligibilityProcess();
+        redirectUrl = PROCESS_PENDING_URL;
+      }
+
+      if (responseData.validSummaryAnswers) {
+        redirectUrl = SCHEME_SELECTION_URL;
+      }
+      break;
+  }
+
+  return redirectUrl;
+};
 
 module.exports = {
   jbpmSearchProcessByIdentifier,
   jbpmStartEligibilityProcess,
-  jbpmStartNewProcess,
-  jbpmCreateNewProcess,
+  jbpmCheckExistingProcesses,
   jbpmLoadInProgressProcess,
   jbpmSaveAnswer,
 };
