@@ -19,7 +19,7 @@
             
             {% for key , value in fields %}
               {% if (key != 'shared') %}
-              <h1 class="govuk-heading-xl">{{SCHEME_DISPLAY_DICTIONARY[key]}}</h1>
+              <h1 class="govuk-heading-xl">{{SCHEME_DISPLAY_NAME_DICTIONARY[key]}}</h1>
               {{ renderFields(fields[key]) }}
               {% endif %}
             {% endfor %} 
