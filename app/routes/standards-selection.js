@@ -1,6 +1,6 @@
 const { SCHEME_SELECTION_URL } = require('../constants/endpoints')
 const {
-  ARIABLE_LAND_SCHEME,
+  ARABLE_LAND_SCHEME,
   GRASSLAND_SCHEME,
   MOORLAND_SCHEME,
   SCHEME_DISPLAY_NAME_DICTIONARY,
@@ -25,16 +25,18 @@ module.exports = {
     const inProgressProcess = await jbpmLoadInProgressProcess(jbpmProcessId)
 
     const { schemes } = inProgressProcess
-    const availableSchemes = schemes.map((scheme) => ({
-      value: SCHEME_DISPLAY_NAME_DICTIONARY[scheme],
+    let availableSchemes = schemes.map((scheme) => ({
+      value: scheme,
       text: SCHEME_DISPLAY_TEXT_DICTIONARY[scheme],
       hint: {
         text: [SCHEME_DISPLAY_HINT_DICTIONARY[scheme]]
       }
     }))
 
+    availableSchemes = [...new Set(availableSchemes.map(obj => JSON.stringify(obj)))].map(str => JSON.parse(str))
+
     return h.view(viewTemplate, {
-      ARIABLE_LAND_SCHEME,
+      ARABLE_LAND_SCHEME,
       GRASSLAND_SCHEME,
       MOORLAND_SCHEME,
       SCHEME_DISPLAY_NAME_DICTIONARY,

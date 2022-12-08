@@ -24,8 +24,9 @@ async function createServer () {
     require('./routes/sbi-summary'),
     require('./routes/application-summary'),
     require('./routes/cannot-proceed'),
-    require('./routes/no-elligible-parcel'),
-    require('./routes/process-pending')
+    require('./routes/no-eligible-parcel'),
+    require('./routes/process-pending'),
+    require('./routes/unhandled-error')
   )
 
   await server.register(vision)

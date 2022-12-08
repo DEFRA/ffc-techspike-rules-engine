@@ -12,14 +12,11 @@ const PROCESS_PENDING_URL = 'process-pending'
 const JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS = (processId) =>
   `${process.env.JBPM_URL}/kie-server/services/rest/server/queries/processes/instances/${processId}?withVars=true`
 
-const JBPM_LOAD_IN_PROGRESS_PROCESS = (processId) =>
-  `${process.env.JBPM_URL}/kie-server/services/rest/server/queries/processes/instances/${processId}/variables/instances`
-
 const JBPM_START_ELIGIBILITY_PROCESS = `${process.env.JBPM_URL}/kie-server/services/rest/server/containers/${process.env.POC_CONTAINER_ID}/processes/${process.env.ELIGIBILITY_PROCESS_DEFINITION_ID}/instances`
 
 const JBPM_SEARCH_PROCESS_BY_IDENTIFIER = (sbi, statuses) => {
   const statusString = statuses.map((status) => `status=${status}`).join('&')
-  return `${process.env.JBPM_URL}/kie-server/services/rest/server/queries/processes/instances/variables/processIdentifier?varValue=SFI_${sbi}${process.env.PROCESS_SUFFIX}&${statusString}`
+  return `${process.env.JBPM_URL}/kie-server/services/rest/server/queries/processes/instances/variables/processIdentifier?varValue=SFI_${sbi}${process.env.PROCESS_SUFFIX}&${statusString}&pageSize=10000`
 }
 
 const JBPM_COMPLETE_SUMMARY_ANSWER = (taskId) =>
@@ -46,7 +43,6 @@ module.exports = {
   HOME_URL,
   PROCESS_PENDING_URL,
   JBPM_START_ELIGIBILITY_PROCESS,
-  JBPM_LOAD_IN_PROGRESS_PROCESS,
   JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS,
   JBPM_SEARCH_PROCESS_BY_IDENTIFIER,
   JBPM_COMPLETE_SUMMARY_ANSWER,

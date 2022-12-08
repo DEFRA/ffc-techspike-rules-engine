@@ -3,7 +3,9 @@
      fetch('/jbpm-status-checker')
       .then((response) => response.json())
       .then((data) => {
-        window.location = data.redirectUrl
+        if(data.redirectUrl){
+          window.location = data.redirectUrl
+        }
       });
-  }, 5000);
+  }, 1500);
 </script>

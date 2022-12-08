@@ -1,6 +1,6 @@
 const generateChoiceOptions = (field) => {
   if (['CheckBox', 'RadioGroup'].includes(field.fieldType)) {
-    field.items = field.choiceOptions.split(';').map((option) => {
+    field.items = field.choiceOptions?.split(';').map((option) => {
       const options = option.split(':')
 
       return {

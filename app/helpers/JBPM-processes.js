@@ -6,31 +6,14 @@ const {
   JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS,
   AUTH_HEADER,
   JBPM_SEARCH_PROCESS_BY_IDENTIFIER,
-  JBPM_COMPLETE_SUMMARY_ANSWER,
-  LAND_SUMMARY_URL,
-  PROCESS_PENDING_URL,
-  SCHEME_SELECTION_URL,
-  JBPM_LOAD_IN_PROGRESS_PROCESS
+  JBPM_COMPLETE_SUMMARY_ANSWER
 } = require('../constants/endpoints')
-const {
-  PENDING,
-  ACTIVE,
-  COMPLETED,
-  ABORTED,
-  SUSPENDED
-} = require('../constants/JBPM-process-statuses')
 const { generateChoiceOptions } = require('./generateChoiceOptions')
 
-const jbpmSearchProcessByIdentifier = async (sbi) =>
+const jbpmSearchProcessByIdentifier = async (sbi, statuses) =>
   await axios
     .get(
-      JBPM_SEARCH_PROCESS_BY_IDENTIFIER(sbi, [
-        PENDING,
-        ACTIVE,
-        COMPLETED,
-        ABORTED,
-        SUSPENDED
-      ]),
+      JBPM_SEARCH_PROCESS_BY_IDENTIFIER(sbi, statuses),
       AUTH_HEADER
     )
     .then((response) => {
@@ -54,20 +37,36 @@ const jbpmStartEligibilityProcess = async (sbi) =>
       console.log(err)
     })
 
-const jbpmLoadInProgressProcess = async (sbi) => {
+const jbpmLoadInProgressProcess = async (jbpmProcessId) => {
   let totalParcels = 0
   let totalLand = 0
   const totals = {}
   const questionsList = []
   let schemes = []
   let jbpmTaskId = null
+  let leastOneParcelEligible
+  let validSummaryAnswers
+  let parcelDetailsReceived
+  let processInstanceState
 
   await axios
-    .get(JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS(sbi), AUTH_HEADER)
+    .get(JBPM_LOAD_IN_PROGRESS_PROCESS_WITH_VARS(jbpmProcessId), AUTH_HEADER)
     .then((response) => {
       const { landList, summaryQuestionList, schemeEligibilityListP } =
         response.data['process-instance-variables']
-      jbpmTaskId = response.data['active-user-tasks']['task-summary'].filter(task => task['task-name'] === 'Get Summary Answer')[0]['task-id']
+
+      processInstanceState = response.data['process-instance-state']
+
+      leastOneParcelEligible = response.data['process-instance-variables'].leastOneParcelEligible
+      validSummaryAnswers = response.data['process-instance-variables'].validSummaryAnswers
+      parcelDetailsReceived = response.data['process-instance-variables'].parcelDetailsReceived
+
+      if (response.data['active-user-tasks'] != null && typeof response.data['active-user-tasks'] !== 'undefined' && response.data['active-user-tasks']['task-summary'] != null && typeof response.data['active-user-tasks']['task-summary'] !== 'undefined') {
+        const filteredData = response.data['active-user-tasks']['task-summary'].filter(task => task['task-name'] === 'Get Summary Answer')
+        if (filteredData.length) {
+          jbpmTaskId = filteredData[0]['task-id']
+        }
+      }
 
       parseString(summaryQuestionList, (err, result) => {
         if (err) {
@@ -121,7 +120,7 @@ const jbpmLoadInProgressProcess = async (sbi) => {
       })
     })
 
-  return { totalParcels, totalLand, totals, questionsList, schemes, jbpmTaskId }
+  return { totalParcels, totalLand, totals, questionsList, schemes, jbpmTaskId, leastOneParcelEligible, validSummaryAnswers, parcelDetailsReceived, processInstanceState }
 }
 
 const jbpmSaveAnswer = async (jbpmTaskId, data) => {
@@ -138,107 +137,9 @@ const jbpmSaveAnswer = async (jbpmTaskId, data) => {
   return res
 }
 
-const jbpmCheckExistingProcesses = async (sbi) => {
-  const runningInstances = await jbpmSearchProcessByIdentifier(sbi)
-
-  if (!runningInstances && !runningInstances.length) {
-    await jbpmStartEligibilityProcess()
-    return PROCESS_PENDING_URL
-  }
-
-  const latestRunningInstace = runningInstances
-    .sort((a, b) => new Date(a['start-date']) - new Date(b['start-date']))
-    .reverse()[0]
-
-  // handle  latestRunningInstace["process-instance-state" undefined
-  const jbpmProcessId = latestRunningInstace['process-instance-id']
-
-  const responseData = await jbpmGetProcessStatus(
-    jbpmProcessId
-  )
-
-  const redirectUrl = await jbpmLatestProcessRunningInstance(
-    latestRunningInstace,
-    responseData
-  )
-
-  return redirectUrl
-}
-
-const jbpmGetProcessStatus = async (sbi) =>
-  await axios
-    .get(JBPM_LOAD_IN_PROGRESS_PROCESS(sbi), AUTH_HEADER)
-    .then((response) => {
-      const parsedResponse = {}
-
-      response.data['variable-instance'].forEach((statusData) => {
-        if (
-          [
-            'leastOneParcelEligible',
-            'validSummaryAnswers',
-            'parcelDetailsReceived'
-          ].includes(statusData.name)
-        ) {
-          parsedResponse[statusData.name] = statusData.value
-        }
-      })
-
-      return parsedResponse
-    })
-
-const jbpmLatestProcessRunningInstance = async (
-  latestRunningInstace,
-  responseData
-) => {
-  let redirectUrl = `${LAND_SUMMARY_URL}`
-
-  if (typeof latestRunningInstace['process-instance-state'] === 'undefined') {
-    await jbpmStartEligibilityProcess()
-    redirectUrl = PROCESS_PENDING_URL
-  }
-
-  switch (latestRunningInstace['process-instance-state']) {
-    case PENDING:
-      redirectUrl = PROCESS_PENDING_URL
-      break
-
-    case ACTIVE:
-      if (!responseData?.parcelDetailsReceived) {
-        redirectUrl = PROCESS_PENDING_URL
-      }
-
-      if (
-        typeof latestRunningInstace !== 'undefined' &&
-        latestRunningInstace['task-id']
-      ) {
-        redirectUrl = `${LAND_SUMMARY_URL}`
-      }
-      break
-
-    case COMPLETED:
-      if (!responseData?.leastOneParcelEligible) {
-        await jbpmStartEligibilityProcess()
-        redirectUrl = PROCESS_PENDING_URL
-      }
-
-      if (!responseData?.validSummaryAnswers) {
-        await jbpmStartEligibilityProcess()
-        redirectUrl = PROCESS_PENDING_URL
-      }
-
-      if (responseData.validSummaryAnswers) {
-        redirectUrl = SCHEME_SELECTION_URL
-      }
-      break
-  }
-
-  return redirectUrl
-}
-
 module.exports = {
   jbpmSearchProcessByIdentifier,
   jbpmStartEligibilityProcess,
-  jbpmCheckExistingProcesses,
   jbpmLoadInProgressProcess,
   jbpmSaveAnswer
 }
