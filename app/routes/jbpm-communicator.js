@@ -1,4 +1,3 @@
-const axios = require('axios')
 const {
   LAND_SUMMARY_URL,
   SCHEME_SELECTION_URL,
